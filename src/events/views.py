@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
 
+from .models import Selector
+
 
 class DashboardView(TemplateView):
 
@@ -11,6 +13,8 @@ class DashboardView(TemplateView):
         """
 
         context = TemplateView.get_context_data(self, **kwargs)
+
+        context["probes"] = Selector.factory(kwargs["selector"]).get_probes()
 
         # Modify context here
 
