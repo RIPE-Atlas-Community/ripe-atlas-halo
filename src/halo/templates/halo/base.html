@@ -1,0 +1,32 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>RIPE Atlas Halo</title>
+    <link rel="stylesheet" href="{% static 'contrib/bootstrap/css/bootstrap.min.css' %}" />
+    <style>
+      h1 {
+        text-align: center;
+      }
+    </style>
+    {% block css %}{% endblock css %}
+    <script src="{% static 'contrib/jquery-1.12.3.min.js' %}"></script>
+    <script src="{% static 'contrib/bootstrap/js/bootstrap.min.js' %}"></script>
+    {% block js_header %}{% endblock js_header %}
+  </head>
+  <body>
+
+    <div class="content">
+      <div class="row">
+        <div class="col-xs-12">
+          <img src="{% static 'halo/img/logo.svg' %}" class="img-responsive" />
+          <h1>Halo <small>(wtfigo?)</small></h1>
+          {% block content %}{% endblock content %}
+        </div>
+      </div>
+    </div>
+
+    {% block js_footer %}{% endblock js_footer %}
+
+  </body>
+</html>

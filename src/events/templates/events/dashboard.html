@@ -1,0 +1,41 @@
+{% extends 'halo/base.html' %}
+
+
+{% load staticfiles %}
+
+
+{% block css %}
+
+  {{ block.super }}
+
+  <style>
+    .map, .time-chart, .events {
+      border: 1px solid #cccccc;
+      margin: 1em 0;
+    }
+    .map {
+      height: 30em;
+    }
+    .time-chart {
+      height: 30em;
+    }
+  </style>
+
+{% endblock css %}
+
+
+{% block js_header %}
+{% endblock js_header %}
+
+
+{% block content %}
+  <div class="col-xs-12">
+    <div id="map" class="map"></div>
+  </div>
+  <div class="col-md-6">
+    <div id="time-chart" class="time-chart"></div>
+  </div>
+  <div class="col-md-6">
+    <div id="events" class="events"></div>
+  </div>
+{% endblock content %}
