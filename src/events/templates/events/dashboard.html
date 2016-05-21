@@ -8,6 +8,8 @@
 
   {{ block.super }}
 
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.18.0/mapbox-gl.css' rel='stylesheet' />
+
   <style>
     .map, .time-chart, .events {
       border: 1px solid #cccccc;
@@ -25,6 +27,7 @@
 
 
 {% block js_header %}
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.18.0/mapbox-gl.js'></script>
 {% endblock js_header %}
 
 
@@ -45,3 +48,40 @@
     </div>
   </div>
 {% endblock content %}
+
+
+{% block js_footer %}
+  <script>
+
+    // Look this shit up: https://www.mapbox.com/mapbox-gl-style-spec/
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuaWVscXVpbm4iLCJhIjoiY2lvaGMwMG4xMDA2N3c4ajdvZXRuZnF1OSJ9.neNjmmx3M3yOmBPgpDS3nw';
+      var map = new mapboxgl.Map({
+          container: 'map',
+          style: 'mapbox://styles/mapbox/dark-v8'
+      });
+
+    map.on("load", function() {
+      map.addSource("markers", {
+        "type": "geojson",
+        "data": {
+          "type": "FeatureCollection",
+          "features": {{ geography|safe }}
+        }
+      });
+
+      map.addLayer({
+        "id": "markers",
+        "type": "symbol",
+        "source": "markers",
+        "layout": {
+          "icon-image": "star-15",
+          "text-field": "w00t",
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0.6],
+          "text-anchor": "top"
+        }
+      });
+    });
+
+  </script>
+{% endblock js_footer %}

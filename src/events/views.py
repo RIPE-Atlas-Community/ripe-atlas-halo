@@ -1,3 +1,5 @@
+import json
+
 from datetime import datetime
 from dateutil.parser import parse
 
@@ -38,11 +40,15 @@ class DashboardView(TemplateView):
         r = []
         for probe in self.probes:
             r.append({
-              "type": "Feature",
-              "geometry": probe.geometry,
-              "properties": {
-                "id": probe.id
-              }
+                "type": "Feature",
+                "geometry": probe.geometry,
+                "properties": {
+                    "id": probe.id,
+                    "marker-size": "large",
+                    "marker-color": "#199638",
+                    "marker-style": "star"
+                }
             })
 
-        return r
+        print(json.dumps(r, indent=2, separators=(",", ":")))
+        return json.dumps(r, separators=(",", ":"))

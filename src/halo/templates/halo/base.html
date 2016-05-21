@@ -8,6 +8,10 @@
       h1 {
         text-align: center;
       }
+      img.logo {
+        height: 100px;
+        margin: 1em;
+      }
     </style>
     {% block css %}{% endblock css %}
     <script src="{% static 'contrib/jquery-1.12.3.min.js' %}"></script>
@@ -19,7 +23,7 @@
     <div class="content">
       <div class="row">
         <div class="col-xs-12">
-          <img src="{% static 'halo/img/logo.svg' %}" class="img-responsive" />
+          <img src="{% static 'halo/img/logo.svg' %}" class="img-responsive logo" />
           <h1>Halo <small>(wtfigo?)</small></h1>
           {% block content %}{% endblock content %}
         </div>
