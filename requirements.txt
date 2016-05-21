@@ -1,0 +1,6 @@
+Django
+djangorestframework
+ipython
+django-extensions
+ripe-atlas-cousteau
+ripe.atlas.sagan
