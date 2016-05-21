@@ -2,5 +2,6 @@ Django
 djangorestframework
 ipython
 django-extensions
-ripe-atlas-cousteau
+ripe.atlas.cousteau
 ripe.atlas.sagan
+django_countries
