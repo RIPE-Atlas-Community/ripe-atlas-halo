@@ -28,7 +28,6 @@ class DashboardView(TemplateView):
 
         self.now = kwargs.get("date", self.now) or self.now
         if "date" in kwargs and kwargs["date"]:
-            print(kwargs)
             self.now = parse(kwargs["date"])
 
         self.probes = Selector.factory(kwargs["selector"]).get_probes()
