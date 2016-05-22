@@ -12,6 +12,10 @@
   <link href="{% static 'contrib/c3/css/c3.min.css' %}" rel="stylesheet" />
 
   <style>
+    .content {
+      width: 97%;
+      margin: 0 auto;
+    }
     .map, .time-chart, .events {
       border: 1px solid #333;
       margin: 1em 0;
@@ -28,6 +32,26 @@
     .leaflet-popup-content .btn .btn-info {
       color: #ffffff;
     }
+    .events {
+      padding: 1em;
+    }
+    .c3-axis .tick {
+      fill: #666666;
+    }
+    .bg-danger a {
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .bg-danger a:hover {
+      text-decoration: underline;
+    }
+    h2 {
+      font-size: 64pt;
+      margin: 0.2em;
+    }
+    .outage {
+      cursor: pointer;
+    }
   </style>
 
 {% endblock css %}
@@ -41,23 +65,45 @@
 
 
 {% block content %}
-  <div claas="col-xs-12">
+
+  <div class="clearfix"></div>
+
+  <div class="col-md-6">
+    <h2 class="text-center">{{ name }}</h2>
+  </div>
+
+  <div class="col-md-6" style="margin-top: 3em;">
     {% include 'events/form.html' %}
   </div>
-  <div class="col-xs-12">
+
+  <div class="clearfix"></div>
+
+  <div class="col-md-6">
     <div id="map" class="map"></div>
   </div>
   <div class="col-md-6">
-    <div id="time-chart" class="time-chart"></div>
-  </div>
-  <div class="col-md-6">
     <div id="events" class="events">
-      <table class="table table-striped table-responsive">
-        <tr>
-          <td>Thing!</td>
-        </tr>
+      <h3>Outages</h3>
+      {% if not outages or not outages.0.probe_ids %}
+        <div class="alert alert-success">Everybody chill: Things are lookin' good.</div>
+      {% endif %}
+      <table class="table table-responsive">
+        {% for outage in outages %}
+          <tr class="outage bg-{{ outage.probe_ids|yesno:'danger,info,primary' }}" data-probe_ids="{% for probe_id in outage.probe_ids %}{{ probe_id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+            <td class="text-nowrap">{{ outage.start_time }}</td>
+            <td class="text-nowrap">{{ outage.stop_time }}</td>
+            <td>
+              {% for probe_id in outage.probe_ids %}
+                <a href="https://atlas.ripe.net/api/probes/{{ probe_id }}">{{ probe_id }}</a>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
       </table>
     </div>
+  </div>
+  <div class="col-xs-12">
+    <div id="time-chart" class="time-chart"></div>
   </div>
 {% endblock content %}
 

@@ -28,7 +28,8 @@ urlpatterns = [
         name="index"
     ),
 
-    url(r"^(?P<selector>.*)$", DashboardView.as_view(), name="dashboard"),
+    url(r"^(?P<selector>[^/]*)/(?P<date>.*)$", DashboardView.as_view(), name="dashboard-historical"),
+    url(r"^(?P<selector>.*)$", DashboardView.as_view(), name="dashboard-now"),
 
     url(r'^admin/', admin.site.urls),
 

@@ -27,7 +27,18 @@ class Selector(object):
             return CountrySelector(string)
         return PrefixSelector(string)
 
+    @classmethod
+    def get_name(cls, string):
+        if string.lower().startswith("as"):
+            return "AS #{}".format(string[2:])
+        if string.isdigit():
+            return "AS #{}".format(string)
+        return string
+
     def get_probes(self):
+        """
+        Fetch the probes from the API and do some caching while we're at it.
+        """
 
         cache_key = "probes-{}".format(self.identifier)
 
@@ -35,10 +46,10 @@ class Selector(object):
         if r is not None:
             return r
 
-        cache.set(cache_key, ProbeRequest(**{
+        cache.set(cache_key, list(ProbeRequest(**{
             self.LOOKUP: self.identifier,
             "return_objects": True
-        }), 60 * 15)
+        })), 60 * 15)
 
         return self.get_probes()
 
@@ -78,11 +89,14 @@ class Outages(object):
     """
     def __init__(self, start_time, stop_time, probes,
                  threshold_interval, threshold_p):
+
         self.start_time = start_time
         self.stop_time = stop_time
         self.probe_ids = [p.id for p in list(probes)]
         self.threshold_interval = relativedelta(seconds=threshold_interval)
         self.threshold_p = threshold_p
+
+        self.events = self._get_connect_and_disconnect_events()
 
     def _get_connect_and_disconnect_events(self):
         """
@@ -102,15 +116,25 @@ class Outages(object):
 
         This list is sorted by timestamp.
         """
-        results = AtlasResultsRequest(
+        results = []
+        probe_ids = self.probe_ids[:]
+        while probe_ids:
+            ids = probe_ids[:100]
+            print("Querying: {}".format(ids))
+            results += self._get_results(ids)
+            probe_ids = probe_ids[100:]
+
+        return sorted(results, key=lambda x: x['timestamp'])
+
+    def _get_results(self, probe_ids):
+        return AtlasResultsRequest(
             # 7000 is the undocumented magical measurement ID which
             # returns the connect & disconnect events
             msm_id=7000,
             start=self.start_time,
             stop=self.stop_time,
-            probe_ids=self.probe_ids
+            probe_ids=probe_ids
         ).create()[1]
-        return sorted(results, key=lambda x: x['timestamp'])
 
     def get(self):
         """
@@ -146,12 +170,11 @@ class Outages(object):
 
         # search through our events and find disconnect events
         # that are within the time period
-        all_evts = self._get_connect_and_disconnect_events()
         unpacked_outages = []
-        for n, evt in enumerate(all_evts):
+        for n, evt in enumerate(self.events):
             # use a set to insure that we only track each probe
             # that disconnects once
-            down_prb_ids = set([evt['prb_id']])
+            down_prb_ids = {evt['prb_id']}
 
             # start time is from this event, stop time may change
             # if we find other events in this time period
@@ -161,7 +184,7 @@ class Outages(object):
             # check all events after this one that are in this
             # time window
             time_limit = start_time + self.threshold_interval
-            for check_evt in all_evts[n+1:]:
+            for check_evt in self.events[n+1:]:
                 when = datetime.fromtimestamp(check_evt['timestamp'])
                 if when > time_limit:
                     break
@@ -222,14 +245,4 @@ class Outages(object):
                 all_outages.append(non_outage)
                 when = self.stop_time + timedelta(seconds=1)
 
-        return all_outages
-
-# def test():
-#     from dateutil.parser import parse
-#    start = datetime.utcnow() - relativedelta(days=1)
-##    start = datetime.utcnow() - relativedelta(hours=1)
-#    stop = datetime.utcnow()
-#    probes = list(Selector.factory("dk").get_probes())
-#    print("There are %d probes" % len(list(probes)))
-#    ev = Outages(start, stop, probes, 900, 0.01)
-#    return ev.get()
+        return reversed(all_outages)

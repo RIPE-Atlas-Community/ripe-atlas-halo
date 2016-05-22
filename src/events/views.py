@@ -1,10 +1,12 @@
 import json
 
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 
 from django.views.generic import TemplateView
 
-from .models import Selector, Event
+from .models import Selector, Outages
 
 
 class DashboardView(TemplateView):
@@ -14,7 +16,8 @@ class DashboardView(TemplateView):
     def __init__(self):
         TemplateView.__init__(self)
         self.probes = None
-        self.connection_log = []
+        self.outages = []
+        self.now = datetime.utcnow() - relativedelta(days=1)
 
     def get_context_data(self, **kwargs):
         """
@@ -23,11 +26,26 @@ class DashboardView(TemplateView):
 
         context = TemplateView.get_context_data(self, **kwargs)
 
-        self.probes = Selector.factory(kwargs["selector"]).get_probes()
+        self.now = kwargs.get("date", self.now) or self.now
+        if "date" in kwargs and kwargs["date"]:
+            print(kwargs)
+            self.now = parse(kwargs["date"])
 
+        self.probes = Selector.factory(kwargs["selector"]).get_probes()
+        self.outages = Outages(
+            self.now,
+            self.now + relativedelta(days=1),
+            self.probes,
+            900,
+            0.01
+        )
+
+        context["date"] = kwargs.get("date", "")
+        context["selector"] = kwargs["selector"]
         context["geography"] = self.get_geojson()
-        context["log"] = self.get_connection_log()
-        print(json.dumps(json.loads(context["log"]), indent=2))
+        context["outages"] = self.outages.get()
+        context["log"] = self.get_connection_log(self.outages.events)
+        context["name"] = Selector.get_name(kwargs["selector"])
 
         return context
 
@@ -43,22 +61,24 @@ class DashboardView(TemplateView):
 
         return json.dumps(r, separators=(",", ":"))
 
-    def get_connection_log(self):
+    def get_connection_log(self, events):
 
         r = {
-            "x": [],
-            "connect": [],
-            "disconnect": []
+            "x": ["x"],
+            "connect": ["connect"],
+            "disconnect": ["disconnect"]
         }
 
-        events = sorted(Event.get_raw_data(
-            list(self.probes)[:300]),
-            key=lambda x: x["timestamp"]
-        )
+        for t in range(events[0]["timestamp"] + 900, events[-1]["timestamp"], 900):
+            r["x"].append(datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S"))
+            counters = {
+                "connect": 0,
+                "disconnect": 0
+            }
+            for event in events:
+                if t - 900 <= event["timestamp"] <= t:
+                    counters[event["event"]] += 1
+            r["connect"].append(counters["connect"])
+            r["disconnect"].append(counters["disconnect"])
 
-        for delta in events:
-            bucket = delta["timestamp"] // 15
-            t = bucket * 15
-
-            r["x"].append(datetime.fromtimestamp(bucket).strftime("%Y-%m-%d %H:%i%s"))
-            r[delta["event"]] = 7
+        return json.dumps(r, separators=(",", ":"))

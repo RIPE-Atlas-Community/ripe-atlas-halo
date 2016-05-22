@@ -2,7 +2,8 @@
   <form method="get" class="form-inline" id="lookup">
     <div class="form-group">
       <label for="selector">Type Something:</label>
-      <input type="text" id="selector" name="selector" class="form-control" placeholder="An ASN, Country, or Prefix" />
+      <input type="text" id="selector" name="selector" class="form-control" placeholder="An ASN, Country, or Prefix" value="{{ selector }}" />
+      <input type="date" id="date" name="date" class="form-control" placeholder="Date" value="{{ date }}" />
       <input type="submit" name="go" value="Go" class="btn btn-primary" />
     </div>
   </form>
@@ -10,7 +11,12 @@
 <script>
   $(document).on("submit", "#lookup", function(e) {
     e.preventDefault();
-    window.location = "{% url 'dashboard' selector="0000" %}".replace(
-      "0000", $("#selector").val());
+    window.location = "{% url 'dashboard-historical' selector="0000" date='1111' %}".replace(
+      "0000",
+      $("#selector").val()
+    ).replace(
+      "1111",
+      $("#date").val()
+    );
   });
 </script>
