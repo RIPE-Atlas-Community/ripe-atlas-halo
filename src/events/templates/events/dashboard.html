@@ -8,7 +8,8 @@
 
   {{ block.super }}
 
-  <link href='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css' rel='stylesheet' />
+  <link href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" rel='stylesheet' />
+  <link href="{% static 'contrib/c3/css/c3.min.css' %}" rel="stylesheet" />
 
   <style>
     .map, .time-chart, .events {
@@ -24,13 +25,18 @@
     .leaflet-popup-content {
       color: #333333;
     }
+    .leaflet-popup-content .btn .btn-info {
+      color: #ffffff;
+    }
   </style>
 
 {% endblock css %}
 
 
 {% block js_header %}
-  <script src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js'></script>
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+  <script src="{% static 'contrib/d3/js/d3.min.js' %}"></script>
+  <script src="{% static 'contrib/c3/js/c3.min.js' %}"></script>
 {% endblock js_header %}
 
 
@@ -62,6 +68,8 @@
       "type": "FeatureCollection",
       "features": {{ geography|safe }}
     };
+    var connection_log = {{ log|safe }};
   </script>
   <script src="{% static 'events/js/map.js' %}"></script>
+  <script src="{% static 'events/js/chart.js' %}"></script>
 {% endblock js_footer %}
