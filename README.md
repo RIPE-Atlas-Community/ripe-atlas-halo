@@ -1,4 +1,4 @@
-# ripe-atlas-halo
+# RIPE Atlas Halo
 
 A heads-up display for your network
 
