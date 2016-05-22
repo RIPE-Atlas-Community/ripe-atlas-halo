@@ -18,27 +18,8 @@
 {% endblock css %}
 
 
-{% block js_header %}
-  <script>
-    $(document).on("submit", "#lookup", function(e) {
-      e.preventDefault();
-      window.location = "{% url 'dashboard' selector="0000" %}".replace(
-        "0000", $("#selector").val());
-    });
-  </script>
-{% endblock js_header %}
-
-
 {% block content %}
   <br />
   <br />
-  <div class="col-xs-12 text-center">
-    <form method="get" class="form-inline" id="lookup">
-      <div class="form-group">
-        <label for="selector">Type Something:</label>
-        <input type="text" id="selector" name="selector" class="form-control" placeholder="An ASN, Country, or Prefix" />
-        <input type="submit" name="go" value="Go" class="btn btn-primary" />
-      </div>
-    </form>
-  </div>
+  {% include 'events/form.html' %}
 {% endblock content %}

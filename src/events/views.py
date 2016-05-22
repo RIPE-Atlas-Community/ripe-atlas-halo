@@ -1,11 +1,8 @@
 import json
 
-from datetime import datetime
-from dateutil.parser import parse
-
 from django.views.generic import TemplateView
 
-from .models import Selector
+from .models import Selector, Event
 
 
 class DashboardView(TemplateView):
@@ -15,23 +12,20 @@ class DashboardView(TemplateView):
     def __init__(self):
         TemplateView.__init__(self)
         self.probes = None
-        self.t = datetime.utcnow()
+        self.connection_log = []
 
     def get_context_data(self, **kwargs):
         """
         Generating variables that end up in the view goes here.
         """
 
-        if "t" in self.request.GET:
-            self.t = parse(self.request.GET["t"])
-
         context = TemplateView.get_context_data(self, **kwargs)
 
         self.probes = Selector.factory(kwargs["selector"]).get_probes()
 
         context["geography"] = self.get_geojson()
-
-        # Modify context here
+        context["log"] = self.get_connection_log()
+        print(context["log"])
 
         return context
 
@@ -42,13 +36,16 @@ class DashboardView(TemplateView):
             r.append({
                 "type": "Feature",
                 "geometry": probe.geometry,
-                "properties": {
-                    "id": probe.id,
-                    "marker-size": "large",
-                    "marker-color": "#199638",
-                    "marker-style": "star"
-                }
+                "properties": probe.meta_data
             })
 
-        print(json.dumps(r, indent=2, separators=(",", ":")))
         return json.dumps(r, separators=(",", ":"))
+
+    def get_connection_log(self):
+        return json.dumps(
+            Event.get_raw_data(
+                sorted(list(self.probes), key=lambda x: x["timestamp"])[:300]
+            ),
+            separators=(",", ":"),
+            indent=2
+        )

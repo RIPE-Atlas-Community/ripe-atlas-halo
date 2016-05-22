@@ -8,11 +8,11 @@
 
   {{ block.super }}
 
-  <link href='https://api.mapbox.com/mapbox-gl-js/v0.18.0/mapbox-gl.css' rel='stylesheet' />
+  <link href='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css' rel='stylesheet' />
 
   <style>
     .map, .time-chart, .events {
-      border: 1px solid #cccccc;
+      border: 1px solid #333;
       margin: 1em 0;
     }
     .map {
@@ -21,17 +21,23 @@
     .time-chart {
       height: 30em;
     }
+    .leaflet-popup-content {
+      color: #333333;
+    }
   </style>
 
 {% endblock css %}
 
 
 {% block js_header %}
-  <script src='https://api.mapbox.com/mapbox-gl-js/v0.18.0/mapbox-gl.js'></script>
+  <script src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js'></script>
 {% endblock js_header %}
 
 
 {% block content %}
+  <div claas="col-xs-12">
+    {% include 'events/form.html' %}
+  </div>
   <div class="col-xs-12">
     <div id="map" class="map"></div>
   </div>
@@ -52,36 +58,10 @@
 
 {% block js_footer %}
   <script>
-
-    // Look this shit up: https://www.mapbox.com/mapbox-gl-style-spec/
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuaWVscXVpbm4iLCJhIjoiY2lvaGMwMG4xMDA2N3c4ajdvZXRuZnF1OSJ9.neNjmmx3M3yOmBPgpDS3nw';
-      var map = new mapboxgl.Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/dark-v8'
-      });
-
-    map.on("load", function() {
-      map.addSource("markers", {
-        "type": "geojson",
-        "data": {
-          "type": "FeatureCollection",
-          "features": {{ geography|safe }}
-        }
-      });
-
-      map.addLayer({
-        "id": "markers",
-        "type": "symbol",
-        "source": "markers",
-        "layout": {
-          "icon-image": "star-15",
-          "text-field": "w00t",
-          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-          "text-offset": [0, 0.6],
-          "text-anchor": "top"
-        }
-      });
-    });
-
+    var features = {
+      "type": "FeatureCollection",
+      "features": {{ geography|safe }}
+    };
   </script>
+  <script src="{% static 'events/js/map.js' %}"></script>
 {% endblock js_footer %}

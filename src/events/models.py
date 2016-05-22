@@ -1,17 +1,15 @@
 from datetime import datetime
-from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
-from django.views.generic import TemplateView
-
-from ripe.atlas.cousteau import AtlasResultsRequest
-
+from django.core.cache import cache
 from django_countries import countries
 
-from ripe.atlas.cousteau import ProbeRequest
+from ripe.atlas.cousteau import AtlasResultsRequest, ProbeRequest
 
 
 class Selector(object):
+
+    LOOKUP = None
 
     def __init__(self, string):
         self.identifier = string
@@ -26,27 +24,39 @@ class Selector(object):
             return CountrySelector(string)
         return PrefixSelector(string)
 
+    def get_probes(self):
+
+        cache_key = "probes-{}".format(self.identifier)
+
+        r = cache.get(cache_key)
+        if r is not None:
+            return r
+
+        cache.set(cache_key, ProbeRequest(**{
+            self.LOOKUP: self.identifier,
+            "return_objects": True
+        }), 60 * 15)
+
+        return self.get_probes()
+
 
 class AsSelector(Selector):
+
+    LOOKUP = "asn"
 
     def __init__(self, string):
         Selector.__init__(self, string)
         self.identifier = int(self.identifier)
 
-    def get_probes(self):
-        return ProbeRequest(asn=self.identifier, return_objects=True)
-
 
 class PrefixSelector(Selector):
 
-    def get_probes(self):
-        return ProbeRequest(prefix=self.identifier, return_objects=True)
+    LOOKUP = "prefix"
 
 
 class CountrySelector(Selector):
 
-    def get_probes(self):
-        return ProbeRequest(country_code=self.identifier, return_objects=True)
+    LOOKUP = "country_code"
 
 
 class Event(object):
