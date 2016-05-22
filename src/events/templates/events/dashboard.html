@@ -85,7 +85,7 @@
     <div id="events" class="events">
       <h3>Outages</h3>
       {% if not outages or not outages.0.probe_ids %}
-        <div class="alert alert-success">Everybody chill: Things are lookin' good.</div>
+        <div class="alert alert-success">Everybody chill: Things are lookin' good. (Right now anyway)</div>
       {% endif %}
       <table class="table table-responsive">
         {% for outage in outages %}
