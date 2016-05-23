@@ -245,4 +245,8 @@ class Outages(object):
                 all_outages.append(non_outage)
                 when = self.stop_time + timedelta(seconds=1)
 
+        # try a list instead of a set for our probe ids
+        for outage in all_outages:
+            outage['probe_ids'] = sorted(list(outage['probe_ids']))
+
         return reversed(all_outages)
