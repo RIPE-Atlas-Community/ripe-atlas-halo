@@ -94,7 +94,7 @@
             <td class="text-nowrap">{{ outage.stop_time }}</td>
             <td>
               {% for probe_id in outage.probe_ids %}
-                <a href="https://atlas.ripe.net/api/probes/{{ probe_id }}">{{ probe_id }}</a>
+                <a href="https://atlas.ripe.net/probes/{{ probe_id }}/">{{ probe_id }}</a>
               {% endfor %}
             </td>
           </tr>
