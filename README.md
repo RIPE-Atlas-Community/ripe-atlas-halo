@@ -10,7 +10,7 @@ easy.  Just do the following:
 1. Create a virtualenv (Python 3.4+)
 2. Enter that virtualenv
 3. Check out the code from this repo
-4. Run `pip install -r requirement.txt` (in the root of this project)
+4. Run `pip install -r requirements.txt` (in the root of this project)
 5. Change to the `src` directory in this project
 6. Run `./manage.py migrate`
 7. Run `./manage.py runserver`
