@@ -16,6 +16,12 @@ easy.  Just do the following:
 7. Run `./manage.py runserver`
 8. Open a browser and point it at http://localhost:8000/
 
+## Docker Version
+
+1. docker build . -t ripe-atlas-halo
+1. docker run --rm -d -P ripe-atlas-halo
+1. Open a browser and point it at http://localhost:8000/
+
 ## Colophon
 
 This project was named *"Halo"* after the video game by the same name.  It's a
