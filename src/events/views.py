@@ -68,6 +68,9 @@ class DashboardView(TemplateView):
             "disconnect": ["disconnect"]
         }
 
+        if not events:
+            return json.dumps(r, separators=(",", ":"))
+
         for t in range(events[0]["timestamp"] + 900, events[-1]["timestamp"], 900):
             r["x"].append(datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S"))
             counters = {
