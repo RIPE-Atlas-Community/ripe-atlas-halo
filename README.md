@@ -28,7 +28,7 @@ with the required dependencies based on requirements.txt
 The second command starts the container for use.
 
     docker build -t ripe-atlas-halo .
-    docker run -d -name my-ripe-atlas-halo -p 8000:8000 ripe-atlas-halo
+    docker run -d --name my-ripe-atlas-halo -p 8000:8000 ripe-atlas-halo
 
 Once the container has started, you can navigate to the interface on http://localhost:8000/
 
