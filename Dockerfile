@@ -1,4 +1,4 @@
-FROM python:3.4
+FROM python:3.8
 
 # Install the dependencies before copying the source code
 # as this prevents frequent docker  build commands from having
